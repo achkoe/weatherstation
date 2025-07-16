@@ -28,7 +28,7 @@ def on_message(client, userdata, message):
     userdata.data[key] = DBFIELDS[key]["cfn"](msg)
     if all([item is not None for item in userdata.data.values()]):
         LOGGER.critical(f"db <- {userdata.data}")
-        userdata.cursor.execute(f"INSERT INTO weather VALUES ({DBVALUES})", userdata.data)
+        userdata.cursor.execute(f"INSERT OR IGNORE INTO weather VALUES ({DBVALUES})", userdata.data)
         userdata.connection.commit()
         for key in userdata.data:
             userdata.data[key] = None 
@@ -45,6 +45,13 @@ if __name__ == "__main__":
     cursor = connection.cursor()
     s = ",".join(f"{key} {DBFIELDS[key]['db']}" for key in DBFIELDS)    
     cursor.execute(f"CREATE TABLE IF NOT EXISTS weather ({s})")
+    s = ",".join(DBFIELDS)
+    cursor.execute(f"CREATE UNIQUE INDEX IF NOT EXISTS uniquedata ON weather ({s})")
+    cursor.execute("""CREATE TRIGGER IF NOT EXISTS deletelastyear AFTER INSERT ON weather
+                   BEGIN
+                   DELETE FROM weather WHERE (julianday('now') - julianday(time, 'unixepoch')) > 0.1;
+                   END
+                   """)
     connection.commit()
     # set userdata for paho client
     userdata = SimpleNamespace(cursor=cursor, connection=connection, data=dict((key, None) for key in DBFIELDS))
