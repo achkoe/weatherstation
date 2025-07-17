@@ -46,10 +46,12 @@ if __name__ == "__main__":
     s = ",".join(f"{key} {DBFIELDS[key]['db']}" for key in DBFIELDS)    
     cursor.execute(f"CREATE TABLE IF NOT EXISTS weather ({s})")
     s = ",".join(DBFIELDS)
+    # avoid writing duplicate items
     cursor.execute(f"CREATE UNIQUE INDEX IF NOT EXISTS uniquedata ON weather ({s})")
+    # create trigger to delete items older than 1 year
     cursor.execute("""CREATE TRIGGER IF NOT EXISTS deletelastyear AFTER INSERT ON weather
                    BEGIN
-                   DELETE FROM weather WHERE (julianday('now') - julianday(time, 'unixepoch')) > 0.1;
+                   DELETE FROM weather WHERE (julianday('now') - julianday(time, 'unixepoch')) > 365;
                    END
                    """)
     connection.commit()
