@@ -7,7 +7,7 @@ def timestamp(datetimestr):
     
 
 DBNAME = "bresser.db"
-DBPATH = pathlib.Path(__file__).parent.joinpath(DBNAME)
+DBPATH = pathlib.Path().joinpath("/", "opt", "weatherstation", DBNAME)
 DBFIELDS = dict(time=dict(db="REAL", cfn=timestamp), temperature_C=dict(db="REAL", cfn=float), humidity=dict(db="REAL", cfn=float), wind_dir_deg=dict(db="REAL", cfn=float), wind_avg_m_s=dict(db="REAL", cfn=float), wind_max_m_s=dict(db="REAL", cfn=float), rain_mm=dict(db="REAL", cfn=float))
 DBVALUES = ", ".join(f":{key}" for key in DBFIELDS)
 
