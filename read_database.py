@@ -18,6 +18,16 @@ if __name__ == "__main__":
     connection.row_factory = dict_factory
     cursor = connection.cursor()
     
+    
+    
+    cursor.execute("SELECT * FROM rain_per_day")
+    while True:
+        item = cursor.fetchone()
+        if item is None:
+            print("last item")
+            break
+        print(item)
+    
     cursor.execute("SELECT * FROM weather ORDER BY time DESC")
     while True:
         item = cursor.fetchone()
