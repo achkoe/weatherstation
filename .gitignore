@@ -1,4 +1,5 @@
 bresser.db
+_systemctl_status.sh
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

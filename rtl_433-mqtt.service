@@ -1,0 +1,9 @@
+[Unit]
+Description=rtl_433 to MQTT publisher
+After=network.target
+[Service]
+ExecStart=/usr/bin/rtl_433
+Restart=always
+RestartSec=5
+[Install]
+WantedBy=multi-user.target
