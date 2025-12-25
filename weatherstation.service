@@ -4,7 +4,7 @@ Description=Read and archive data from a Bresser weather station
 [Service]
 User=root
 WorkingDirectory=/home/pi/weatherstation
-ExecStart=/usr/bin/bash -c 'cd /home/pi/weatherstation/ && source /home/pi/vbresser/bin/activate && python write_database.py'
+ExecStart=/usr/bin/bash -c 'cd /home/pi/weatherstation/ && source /home/pi/.venv/bin/activate && python write_database.py'
 Restart=always
 RestartSec=3
 
