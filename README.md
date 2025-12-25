@@ -14,6 +14,7 @@ Software to read and archive data from a Bresser weather station
 
 ## Installation
 
+```
   sudo apt install rtl-433
 
   sudo apt install mosquitto
@@ -36,18 +37,28 @@ Software to read and archive data from a Bresser weather station
 
   sudo mkdir /opt/weatherstation
   sudo chmod o=rwx /opt/weatherstation
+```
 
 For testing:
-  python write_database.py
 
+```
+  python write_database.py
+```
+
+Continue installion 
+
+
+```
   sudo cp weatherstation.service /etc/systemd/system/
 
   sudo systemctl start weatherstation.service
   sudo systemctl enable weatherstation.service
   sudo systemctl status weatherstation.service
+```
 
-from https://grafana.com/tutorials/install-grafana-on-raspberry-pi/
+From https://grafana.com/tutorials/install-grafana-on-raspberry-pi/
 
+```
   sudo mkdir -p /etc/apt/keyrings/
   wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor | sudo tee /etc/apt/keyrings/grafana.gpg > /dev/null
 
@@ -59,11 +70,8 @@ from https://grafana.com/tutorials/install-grafana-on-raspberry-pi/
   sudo /bin/systemctl enable grafana-server
   sudo /bin/systemctl start grafana-server
 
-now
-
-  http://<ip address>:3000
-
   grafana-cli plugins install frser-sqlite-datasource  
   sudo /bin/systemctl restart grafana-server
+```
 
-now configure database at Home / Connections / Data sources / frser-sqlite-datasource
+Now configure database at `Home/Connections/Data sources/frser-sqlite-datasource`.
