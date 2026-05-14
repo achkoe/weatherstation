@@ -5,12 +5,14 @@ from types import SimpleNamespace
 import datetime
 import sqlite3
 import pathlib
+from dotenv import dotenv_values
 import paho.mqtt.enums as enums
 import paho.mqtt.client as mqtt 
 from common import DBPATH, DBFIELDS, DBVALUES
 
 
-logging.basicConfig(format="%(levelname)s:%(asctime)s:%(message)s", level=logging.INFO)
+loglevel = int(dotenv_values(".env").get("LOGLEVEL", logging.CRITICAL))
+logging.basicConfig(format="%(levelname)s:%(asctime)s:%(lineno)d:%(message)s", level=loglevel)
 LOGGER = logging.getLogger()
 
 
@@ -38,12 +40,12 @@ def on_message(client, userdata, message):
                 twentyfour_before = userdata.data["time"] - 24 * 60 * 60
                 userdata.cursor.execute(f"SELECT rain_mm FROM weather WHERE time <= ? ORDER BY time DESC LIMIT 1", (twentyfour_before, ))
                 userdata.rain_mm_reference = cursor.fetchone()[0]
-                LOGGER.critical(f"rain reference -> {userdata.rain_mm_reference}")
+                LOGGER.info(f"rain reference -> {userdata.rain_mm_reference}")
             else:
                 userdata.data[key] = sum(userdata.data[key][:LENGTH]) / LENGTH
                 if key == "rain_mm" and userdata.rain_mm_reference is not None:
                     rain_per_day_mm = userdata.data[key] - userdata.rain_mm_reference
-                    LOGGER.critical(f"rain per day -> {rain_per_day_mm}")
+                    LOGGER.info(f"rain per day -> {rain_per_day_mm}")
                     userdata.cursor.execute("UPDATE rain_per_day SET rain_per_day_mm = ? WHERE idx = 0", (rain_per_day_mm, ))
         LOGGER.critical(f"db <- {userdata.data}")
         userdata.cursor.execute(f"INSERT OR IGNORE INTO weather VALUES ({DBVALUES})", userdata.data)
