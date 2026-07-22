@@ -29,6 +29,7 @@ Software to read and archive data from a Bresser weather station
 
   sudo mkdir /etc/rtl_433
   sudo cp rtl_433.conf /etc/rtl_433/
+  sudo cp rtl_433-mqtt.service /etc/systemd/system
 
   sudo systemctl start rtl_433-mqtt.service 
   sudo systemctl enable rtl_433-mqtt.service 
