@@ -1,6 +1,7 @@
 [Unit]
 Description=rtl_433 to MQTT publisher
-After=network.target
+After=After=mosquitto.service
+
 [Service]
 ExecStart=/usr/bin/rtl_433
 Restart=always

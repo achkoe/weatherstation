@@ -1,5 +1,6 @@
 [Unit]
 Description=Read and archive data from a Bresser weather station
+After=rtl_433-mqtt.service
 
 [Service]
 User=root
