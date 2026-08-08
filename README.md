@@ -75,3 +75,5 @@ From https://grafana.com/tutorials/install-grafana-on-raspberry-pi/
 ```
 
 Now configure database at `Home/Connections/Data sources/frser-sqlite-datasource`.
+
+See for other information: https://www.brunweb.de/bresser-wetterstation-mqtt/
