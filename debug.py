@@ -2,6 +2,7 @@
 
 import logging
 from types import SimpleNamespace
+from collections import Counter
 import datetime
 import sqlite3
 import pathlib
@@ -27,7 +28,8 @@ LENGTH = 10
 def on_message(client, userdata, message): 
     msg = str(message.payload.decode("utf-8")) 
     key = message.topic.split("/")[-1]
-    LOGGER.info(f"received  topic: {message.topic:30} -> {msg!r}") 
+    userdata.count[key] += 1
+    LOGGER.info(f"received  topic: {userdata.count[key]:4}:{message.topic:30} -> {msg!r}") 
     
     
 def on_connect(client, userdata, flags, rc, properties): 
@@ -37,7 +39,7 @@ def on_connect(client, userdata, flags, rc, properties):
     
 if __name__ == "__main__": 
     # set userdata for paho client
-    userdata = SimpleNamespace()
+    userdata = SimpleNamespace(count=Counter())
     # mqtt stuff
     client = mqtt.Client(enums.CallbackAPIVersion(2), userdata=userdata) 
     client.on_connect = on_connect 

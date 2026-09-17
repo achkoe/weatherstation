@@ -3,9 +3,11 @@
 import logging
 from types import SimpleNamespace
 import datetime
+import time
 import sqlite3
 import pathlib
 from dotenv import dotenv_values
+from sendemail import email
 import paho.mqtt.enums as enums
 import paho.mqtt.client as mqtt 
 from common import DBPATH, DBFIELDS, DBVALUES
@@ -16,8 +18,9 @@ logging.basicConfig(format="%(levelname)s:%(asctime)s:%(lineno)d:%(message)s", l
 LOGGER = logging.getLogger()
 
 
+WANT_TOPICS = list(DBFIELDS.keys()) + ["battery_ok"]
 QOS = 0
-TOPIC = [(f"rtl_433/46672/{key}", QOS) for key in DBFIELDS]
+TOPIC = [(f"rtl_433/46672/{key}", QOS) for key in WANT_TOPICS]
 
 BROKER_ADDRESS = "127.0.0.1" 
 PORT = 1883 
@@ -27,6 +30,19 @@ LENGTH = 10
 def on_message(client, userdata, message): 
     msg = str(message.payload.decode("utf-8")) 
     key = message.topic.split("/")[-1]
+    
+    # LOGGER.critical(f"{key}: {msg}")
+    
+    if key == "battery_ok":
+        if msg != "1" and (userdata.last_email_send_date is None or time.time() - userdata.last_email_send_date > 24 * 60 * 60):
+            # send email if battery is low every 24 hours
+            email_subject = "Warning: weatherstation battery is low"
+            email_message = f"Please change weatherstation battery!\nmsg={msg!r}"
+            email(email_subject, email_message)
+            userdata.last_email_send_date = time.time()
+            LOGGER.critical(email_subject)
+        return
+        
     if key == "time":
         userdata.count += 1
     LOGGER.info(f"message {userdata.count}/{LENGTH} received: {msg!r}, topic: {message.topic}") 
@@ -79,7 +95,7 @@ if __name__ == "__main__":
     connection.commit()
         
     # set userdata for paho client
-    userdata = SimpleNamespace(cursor=cursor, connection=connection, data=dict((key, []) for key in DBFIELDS), rain_mm_reference=None, count=0)
+    userdata = SimpleNamespace(cursor=cursor, connection=connection, data=dict((key, []) for key in DBFIELDS), rain_mm_reference=None, count=0, last_email_send_date=None)
     # mqtt stuff
     client = mqtt.Client(enums.CallbackAPIVersion(2), userdata=userdata) 
     client.on_connect = on_connect 
